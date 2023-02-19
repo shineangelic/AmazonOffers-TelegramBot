@@ -5,7 +5,9 @@ from paapi5_python_sdk.models.search_items_resource import SearchItemsResource
 from paapi5_python_sdk.rest import ApiException
 from response_parser import parse_response
 from consts import *
+import logging
 
+logging.basicConfig(level=logging.INFO)
 # function that search amazon products
 def search_items(keywords, search_index="All", item_page=1):
     default_api = DefaultApi(
@@ -33,8 +35,10 @@ def search_items(keywords, search_index="All", item_page=1):
         SearchItemsResource.OFFERS_LISTINGS_CONDITION,
         SearchItemsResource.OFFERS_LISTINGS_ISBUYBOXWINNER,
         SearchItemsResource.OFFERS_SUMMARIES_LOWESTPRICE,
+        SearchItemsResource.OFFERS_SUMMARIES_HIGHESTPRICE,
         SearchItemsResource.ITEMINFO_CLASSIFICATIONS,
         SearchItemsResource.ITEMINFO_PRODUCTINFO,
+        SearchItemsResource.OFFERS_LISTINGS_DELIVERYINFO_ISPRIMEELIGIBLE,
     ]
 
     """ Forming request """
@@ -55,26 +59,30 @@ def search_items(keywords, search_index="All", item_page=1):
     try:
         """Sending request"""
         response = default_api.search_items(search_items_request)
-        print("Response received, total items:", response.search_result.total_result_count)
+        logging.debug("Response received, total items:", response.search_result.total_result_count)
+
+        if (response.search_result.total_result_count == 0 or response.search_result.items is None):
+            return []
         res = parse_response(response)
 
         if response.errors is not None:
-            print("\nPrinting Errors:\nPrinting First Error Object from list of Errors")
-            print("Error code", response.errors[0].code)
-            print("Error message", response.errors[0].message)
+            logging.error("\nPrinting Errors:\nPrinting First Error Object from list of Errors")
+            logging.error("Error code", response.errors[0].code)
+            logging.error("Error message", response.errors[0].message)
         return res
 
     except ApiException as exception:
-        print("Error calling PA-API 5.0!")
-        print("Status code:", exception.status)
-        print("Errors :", exception.body)
-        print("Request ID:", exception.headers["x-amzn-RequestId"])
+        logging.error("Error calling PA-API 5.0!")
+        logging.error("Status code:", exception.status)
+        logging.error("Errors :", exception.body)
+        logging.error("Request ID:", exception.headers["x-amzn-RequestId"])
+        return []
 
     except TypeError as exception:
-        print("TypeError :", exception)
+        logging.error("TypeError :", exception)
 
     except ValueError as exception:
-        print("ValueError :", exception)
+        logging.error("ValueError :", exception)
 
     except Exception as exception:
-        print("Exception :", exception)
+        logging.error("Exception :", exception)

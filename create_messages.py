@@ -46,6 +46,12 @@ def create_item_html(items):
 
             if 'lowest_price' in list(item.keys()) and item['lowest_price'] == item['price']:
                 html += f"💣 <b>Prezzo minimo garantito</b> 💣\n\n"
+            
+            if 'highest_price' in list(item.keys()) :
+                html += f"📈 <b>In realta partiva da: {item['highest_price']}</b> 📈\n\n"
+            
+            if 'is_prime_eligible' in list(item.keys()) and item['is_prime_eligible']==True:
+                html += f"⏩ <b>Spedizione prime disponibile</b> ⏩\n\n"
 
             html += f"🔎<a href='{item['url']}' title='{item['url']}'>{item['url']}</a>\n\n"
 

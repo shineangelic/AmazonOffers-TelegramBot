@@ -1,5 +1,5 @@
 # This function parses amazon response
-def parse_response(response):
+def parse_response(response) -> list:
     items = response.search_result.items
     res_items = []
 
@@ -62,11 +62,24 @@ def parse_response(response):
                     and item_0.offers.listings[0].price.display_amount is not None
             ):
                 it_parsed["price"] = f'{item_0.offers.listings[0].price.display_amount}'
+            
+            if (
+                    item_0.offers is not None
+                    and item_0.offers.listings is not None
+                    and item_0.offers.listings[0].delivery_info is not None
+                    and item_0.offers.listings[0].delivery_info.is_prime_eligible is not None
+            ):
+                it_parsed["is_prime_eligible"] = f'{item_0.offers.listings[0].delivery_info.is_prime_eligible}'
 
             if (item_0.offers is not None
                     and item_0.offers.summaries is not None
                     and item_0.offers.summaries[0].lowest_price is not None):
                 it_parsed["lowest_price"] = f'{item_0.offers.summaries[0].lowest_price.display_amount}'
+            
+            if (item_0.offers is not None
+                    and item_0.offers.summaries is not None
+                    and item_0.offers.summaries[0].highest_price is not None):
+                it_parsed["highest_price"] = f'{item_0.offers.summaries[0].highest_price.display_amount}'
             
             if (item_0.item_info is not None
                     and item_0.item_info.classifications is not None
