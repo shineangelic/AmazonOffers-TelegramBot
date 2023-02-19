@@ -9,6 +9,7 @@ from itertools import chain
 import random
 from consts import *
 import logging
+import asyncio
 
 logging.basicConfig(level=logging.INFO)
 
@@ -21,9 +22,13 @@ A dictionary with {CATEGORY_NAME: [<LIST OF THE CATEGORY KEYWORDS>]}
 """
 
 categories = {
-    "Electronics": [
-        "Televisori",
+    #"HealthPersonalCare": [
+    #    "Anal plug",
+    #],
+    "ToysAndGames": [
+        "Kyosho", "Tamiya", "HPI"
     ]
+
 }
 
 
@@ -32,21 +37,16 @@ def is_active() -> bool:
     return MIN_HOUR < now.hour < MAX_HOUR
 
 
-def send_consecutive_messages(list_of_struct: List[str]) -> None:
-    bot.send_message(
+async def asynch_dequeue_messages(list_of_struct: List[str]) -> List[str]:
+    
+    await bot.send_message(
         chat_id=CHANNEL_NAME,
         text=list_of_struct[0],
         reply_markup=list_of_struct[1],
-        parse_mode=telegram.ParseMode.HTML,
+        parse_mode='HTML',
     )
-
-    bot.send_message(
-        chat_id=CHANNEL_NAME,
-        text=list_of_struct[2],
-        reply_markup=list_of_struct[3],
-        parse_mode=telegram.ParseMode.HTML,
-    )
-    return list_of_struct[4:]
+    logging.info('Posted message %s', list_of_struct[0])
+    return list_of_struct[2:]
 
 
 # run bot function
@@ -59,7 +59,8 @@ def run_bot(bot: telegram.Bot, categories: Dict[str, List[str]]) -> None:
             for category in categories:
                 for keyword in categories[category]:
                     # iterate over pages
-                    for page in range(1, 10):
+                    for page in range(1, 3):
+                        logging.info(f'{5 * "*"} Paged search %s:%s PAGINA:%i{5 * "*"}',category ,keyword,page)
                         items = search_items(keyword, category, item_page=page)
                         # api time limit for another http request is 1 second
                         time.sleep(1)
@@ -73,6 +74,9 @@ def run_bot(bot: telegram.Bot, categories: Dict[str, List[str]]) -> None:
             # creating html message, you can find more information in create_messages.py
             res = create_item_html(items_full)
 
+            if (len(res)<= 3):
+                logging.warning(f'{5 * "*"} Nothing to post {5 * "*"}')
+
             # while we have items in our list
             while len(res) > 3:
 
@@ -81,14 +85,18 @@ def run_bot(bot: telegram.Bot, categories: Dict[str, List[str]]) -> None:
                     try:
                         # Sending two consecutive messages
                         logging.info(f'{5 * "*"} Sending posts to channel {5 * "*"}')
-                        res = send_consecutive_messages(res)
+                        asyncio.run(asynch_dequeue_messages(res))
+                        #res = send_consecutive_messages(res)
 
                     except Exception as e:
-                        logging.info(e)
-                        res = res[4:]
+                        logging.error(e)
+                        res = res[2:]
                         continue
 
                     # Sleep for PAUSE_MINUTES
+                    logging.info(
+                        f'{5 * "*"} BOT sleeping ...  {PAUSE_MINUTES} {5 * "*"}'
+                    )
                     time.sleep(60 * PAUSE_MINUTES)
 
                 else:
@@ -105,5 +113,7 @@ def run_bot(bot: telegram.Bot, categories: Dict[str, List[str]]) -> None:
 if __name__ == "__main__":
     # Create the bot instance
     bot = telegram.Bot(token=TOKEN)
+     
+    
     # running bot
     run_bot(bot=bot, categories=categories)

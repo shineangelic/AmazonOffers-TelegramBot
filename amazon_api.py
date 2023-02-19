@@ -52,7 +52,7 @@ def search_items(keywords, search_index="All", item_page=1):
     try:
         """Sending request"""
         response = default_api.search_items(search_items_request)
-        print("Request received")
+        print("Response received, total items:", response.search_result.total_result_count)
         res = parse_response(response)
 
         if response.errors is not None:
