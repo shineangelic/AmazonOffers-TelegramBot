@@ -1,3 +1,6 @@
+# x docker
+docker image build -t python:0.0.1 /.
+
 # Amazon Offers Telegram Bot
 
 <img src="https://user-images.githubusercontent.com/33979978/109801185-70e74580-7c1e-11eb-847a-dbd6e09c21a3.png" alt="logo" width=300>
