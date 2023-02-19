@@ -32,6 +32,9 @@ def search_items(keywords, search_index="All", item_page=1):
         SearchItemsResource.OFFERS_LISTINGS_PROMOTIONS,
         SearchItemsResource.OFFERS_LISTINGS_CONDITION,
         SearchItemsResource.OFFERS_LISTINGS_ISBUYBOXWINNER,
+        SearchItemsResource.OFFERS_SUMMARIES_LOWESTPRICE,
+        SearchItemsResource.ITEMINFO_CLASSIFICATIONS,
+        SearchItemsResource.ITEMINFO_PRODUCTINFO,
     ]
 
     """ Forming request """
