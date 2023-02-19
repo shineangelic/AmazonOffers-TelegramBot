@@ -15,9 +15,12 @@ def create_item_html(items):
     for item in items:
         # If item has an active offer
         if 'off' in item:
+             # Creating chart button https://dyn.keepa.com/pricehistory.png?domain=8&asin=B0BGPN9D6F&width=501?
+             
             # Creating buy button
             keyboard = [
-                [InlineKeyboardButton("🛒 Acquista ora 🛒", callback_data='buy', url=item["url"])],
+                [InlineKeyboardButton("🛒 Acquista ora", callback_data='buy', url=item["url"])],
+                [InlineKeyboardButton("📉 Grafico prezzi",callback_data='buy',  url='https://dyn.keepa.com/pricehistory.png?domain=8&asin='+item["id"])],
             ]
             reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -25,9 +28,14 @@ def create_item_html(items):
 
             html = ""
             html += f"🎁 <b>{item['title']}</b> 🎁\n\n"
-
             if 'description' in list(item.keys()):
                 html += f"{item['description']}\n"
+
+            if 'product_group' in list(item.keys()):
+                html += f"{item['product_group']}\n"
+
+            if 'product_color' in list(item.keys()):
+                html += f"🖌 Colore: {item['product_color']}\n"
 
             html += f"<a href='{item['image']}'>&#8205</a>\n"
 
@@ -36,8 +44,13 @@ def create_item_html(items):
 
             html += f"💰 <b>Al prezzo di: {item['price']}</b> 💰\n\n"
 
+            if 'lowest_price' in list(item.keys()) and item['lowest_price'] == item['price']:
+                html += f"💣 <b>Prezzo minimo garantito</b> 💣\n\n"
+
+            html += f"🔎<a href='{item['url']}' title='{item['url']}'>{item['url']}</a>\n\n"
+
             if 'savings' in list(item.keys()):
-                html += f"✅ <b>Risparmi: {item['savings']}€</b> ✅\n\n"
+                html += f"💵 <b>Risparmi: {item['savings']}€</b> 💵\n\n"
 
             html += f"<b><a href='{item['url']}'></a></b>"
 

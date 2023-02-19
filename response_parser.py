@@ -44,6 +44,7 @@ def parse_response(response):
             # get item amazon url
             if item_0.detail_page_url is not None:
                 it_parsed["url"] = item_0.detail_page_url
+             
 
             # get item title
             if (
@@ -61,6 +62,20 @@ def parse_response(response):
                     and item_0.offers.listings[0].price.display_amount is not None
             ):
                 it_parsed["price"] = f'{item_0.offers.listings[0].price.display_amount}'
+
+            if (item_0.offers is not None
+                    and item_0.offers.summaries is not None
+                    and item_0.offers.summaries[0].lowest_price is not None):
+                it_parsed["lowest_price"] = f'{item_0.offers.summaries[0].lowest_price.display_amount}'
+            
+            if (item_0.item_info is not None
+                    and item_0.item_info.classifications is not None
+                    and item_0.item_info.classifications.product_group is not None):
+                it_parsed["product_group"] = f'{item_0.item_info.classifications.product_group.display_value}'
+            
+            if (item_0.item_info is not None and item_0.item_info.product_info is not None
+                    and item_0.item_info.product_info.color is not None):
+                it_parsed["product_color"] = f'{item_0.item_info.product_info.color.display_value}'
 
         res_items.append(it_parsed)
     return res_items
